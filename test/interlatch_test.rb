@@ -1,5 +1,14 @@
 require 'test_helper'
 
+ActiveRecord::Base.establish_connection 'test'
+class Foo < ActiveRecord::Base
+end
+Foo.connection.create_table(:foos)
+
+class Bar < ActiveRecord::Base
+end
+Bar.connection.create_table(:bars)
+
 class TestController < ActionController::Base
   def no_args
     behavior_cache do
@@ -30,6 +39,18 @@ class TestController < ActionController::Base
       @foo = 'foo'
     end
   end
+
+  def with_one_dependency
+    behavior_cache Foo do
+      @foo = 'foo'
+    end
+  end
+
+  def with_two_dependencies
+    behavior_cache Foo, Bar do
+      @foo = 'foo'
+    end
+  end
 end
 
 class InterlatchTest < ActionController::TestCase
@@ -38,6 +59,7 @@ class InterlatchTest < ActionController::TestCase
 
     @controller = TestController.new
     @controller.cache_store = @store
+    silence_warnings { Object.const_set "RAILS_CACHE", @store }
   end
 
   def test_view_cache_with_no_args
@@ -57,7 +79,7 @@ class InterlatchTest < ActionController::TestCase
 
     get :no_args, id: '4'
 
-    assert assigns(:foo).nil?
+    assert_nil assigns(:foo)
   end
 
   def test_view_cache_with_tag
@@ -77,7 +99,7 @@ class InterlatchTest < ActionController::TestCase
 
     get :with_tag, id: '4'
 
-    assert assigns(:foo).nil?
+    assert_nil assigns(:foo)
   end
 
   def test_view_cache_with_ttl
@@ -103,7 +125,7 @@ class InterlatchTest < ActionController::TestCase
 
     get :with_global_scope, id: '4'
 
-    assert assigns(:foo).nil?
+    assert_nil assigns(:foo)
   end
 
   def test_view_cache_with_controller_scope
@@ -123,7 +145,7 @@ class InterlatchTest < ActionController::TestCase
 
     get :with_controller_scope, id: '4'
 
-    assert assigns(:foo).nil?
+    assert_nil assigns(:foo)
   end
 
   def test_view_cache_with_action_scope
@@ -143,6 +165,38 @@ class InterlatchTest < ActionController::TestCase
 
     get :with_action_scope, id: '4'
 
-    assert assigns(:foo).nil?
+    assert_nil assigns(:foo)
+  end
+
+  def test_behavior_cache_with_one_dependency
+    get :with_one_dependency, id: '4'
+
+    assert_equal ['views/interlatch:8675309:test:with_one_dependency:4:'], @store.fetch('interlatch:Foo')
+  end
+
+  def test_behavior_cache_with_two_dependencies
+    get :with_two_dependencies, id: '4'
+
+    assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:'], @store.fetch('interlatch:Foo')
+    assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:'], @store.fetch('interlatch:Bar')
+  end
+
+  def test_dependency_with_multiple_view_caches
+    @store.write('interlatch:Foo', ['blah'])
+
+    get :with_one_dependency, id: '4'
+
+    assert_equal ['blah', 'views/interlatch:8675309:test:with_one_dependency:4:'], @store.fetch('interlatch:Foo')
+  end
+
+  def test_create_invalidates_cache
+    Interlatch::InvalidationObserver.instance
+
+    @store.write('interlatch:Foo', ['blah'])
+    @store.write('blah', 'blah')
+
+    Foo.create
+
+    assert_nil @store.read('blah')
   end
 end

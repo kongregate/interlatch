@@ -2,6 +2,7 @@ require 'minitest/autorun'
 
 require 'rails'
 require 'action_controller'
+require 'active_record'
 
 require 'interlatch'
 
@@ -26,3 +27,10 @@ module ActionController
     end
   end
 end
+
+ActiveRecord::Base.configurations = {
+  'test' =>  {
+    'adapter' => 'sqlite3',
+    'database' => ':memory:'
+  }
+}

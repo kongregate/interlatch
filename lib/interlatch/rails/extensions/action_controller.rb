@@ -16,7 +16,18 @@ module ActionController
       options = args.extract_options!
 
       key = caching_key(options[:tag], options[:scope])
-      yield unless fragment_exist? key
+      unless fragment_exist? key
+        yield
+        args.each do |dependency|
+          add_dependency(key, dependency.to_s)
+        end
+      end
+    end
+
+    def add_dependency(key, dependency)
+      dependency_cache = cache_store.fetch("interlatch:#{dependency}") || []
+      dependency_cache << "views/#{key}"
+      cache_store.write("interlatch:#{dependency}", dependency_cache)
     end
   end
 end
