@@ -5,6 +5,8 @@ require 'action_controller'
 
 require 'interlatch'
 
+ENV['RAILS_ASSET_ID'] = '8675309'
+
 SHARED_TEST_ROUTES = ActionDispatch::Routing::RouteSet.new
 SHARED_TEST_ROUTES.draw do
   match ':controller(/:action(/:id))'
