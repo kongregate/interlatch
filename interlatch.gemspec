@@ -2,8 +2,8 @@
 require File.expand_path('../lib/interlatch/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["Drew Chandler"]
-  gem.email         = ["drew@kongregate.com"]
+  gem.authors       = ["Drew Chandler", "Pete Keen"]
+  gem.email         = ["drew@kongregate.com", "pkeen@kongregate.com"]
   gem.description   = %q{TODO: Write a gem description}
   gem.summary       = %q{TODO: Write a gem summary}
   gem.homepage      = ""
