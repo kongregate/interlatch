@@ -14,4 +14,8 @@ Gem::Specification.new do |gem|
   gem.name          = "interlatch"
   gem.require_paths = ["lib"]
   gem.version       = Interlatch::VERSION
+
+  gem.add_dependency('activesupport', '>= 3.0')
+  gem.add_dependency('actionpack', '>= 3.0')
+  gem.add_dependency('railties', '>= 3.0')
 end
