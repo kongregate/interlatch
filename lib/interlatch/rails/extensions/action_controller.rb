@@ -25,7 +25,7 @@ module ActionController
     end
 
     def add_dependency(key, dependency)
-      dependency_cache = cache_store.fetch("interlatch:#{dependency}") || []
+      dependency_cache = cache_store.fetch("interlatch:#{dependency}").try(:dup) || []
       dependency_cache << "views/#{key}"
       cache_store.write("interlatch:#{dependency}", dependency_cache)
     end
