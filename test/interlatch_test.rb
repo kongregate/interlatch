@@ -61,4 +61,10 @@ class InterlatchTest < ActionController::TestCase
 
     assert assigns(:foo).nil?
   end
+
+  def test_view_cache_with_ttl
+    get :with_ttl, id: '4'
+
+    assert_equal 5.minutes, @store.send(:read_entry, 'views/interlatch::test:with_ttl:4:', nil).expires_in
+  end
 end
