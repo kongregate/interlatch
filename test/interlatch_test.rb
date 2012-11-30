@@ -171,22 +171,22 @@ class InterlatchTest < ActionController::TestCase
   def test_behavior_cache_with_one_dependency
     get :with_one_dependency, id: '4'
 
-    assert_equal ['views/interlatch:8675309:test:with_one_dependency:4:'], @store.fetch('interlatch:Foo')
+    assert_equal ['views/interlatch:8675309:test:with_one_dependency:4:'], @store.fetch('interlatch:Foo').to_a
   end
 
   def test_behavior_cache_with_two_dependencies
     get :with_two_dependencies, id: '4'
 
-    assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:'], @store.fetch('interlatch:Foo')
-    assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:'], @store.fetch('interlatch:Bar')
+    assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:'], @store.fetch('interlatch:Foo').to_a
+    assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:'], @store.fetch('interlatch:Bar').to_a
   end
 
   def test_dependency_with_multiple_view_caches
-    @store.write('interlatch:Foo', ['blah'])
+    @store.write('interlatch:Foo', Set.new(['blah']))
 
     get :with_one_dependency, id: '4'
 
-    assert_equal ['blah', 'views/interlatch:8675309:test:with_one_dependency:4:'], @store.fetch('interlatch:Foo')
+    assert_equal ['blah', 'views/interlatch:8675309:test:with_one_dependency:4:'], @store.fetch('interlatch:Foo').to_a
   end
 
   def test_create_invalidates_cache
