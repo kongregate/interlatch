@@ -190,8 +190,6 @@ class InterlatchTest < ActionController::TestCase
   end
 
   def test_create_invalidates_cache
-    Interlatch::InvalidationObserver.instance
-
     @store.write('interlatch:Foo', ['blah'])
     @store.write('blah', 'blah')
 
@@ -201,8 +199,6 @@ class InterlatchTest < ActionController::TestCase
   end
 
   def test_destroy_invalidates_cache
-    Interlatch::InvalidationObserver.instance
-
     f = Foo.create
     @store.write('interlatch:Foo', ['blah'])
     @store.write('blah', 'blah')
