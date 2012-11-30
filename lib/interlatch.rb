@@ -16,16 +16,17 @@ module Interlatch
     ].compact.join(":")
   end
 
-  def dependency_key(dependency_class)
-    "interlatch:#{dependency_class.to_s}"
+  def dependency_key(dependency)
+    dependency_str = dependency.kind_of?(Class) ? dependency.to_s : "#{dependency.class.name}:#{dependency.id}"
+    "interlatch:#{dependency_str}"
   end
 
   def add_dependencies(key, dependencies)
     dependencies.each do |dependency|
-      dependency = dependency.to_s
-      dependency_cache = ::Rails.cache.fetch("interlatch:#{dependency}").try(:dup) || Set.new
+      dep_key = dependency_key(dependency)
+      dependency_cache = ::Rails.cache.fetch(dep_key).try(:dup) || Set.new
       dependency_cache << "views/#{key}"
-      ::Rails.cache.write("interlatch:#{dependency}", dependency_cache)
+      ::Rails.cache.write(dep_key, dependency_cache)
     end
   end
 

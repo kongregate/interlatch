@@ -25,8 +25,6 @@ module Interlatch
             Interlatch.add_dependencies(key, args)
           end
         end
-
-        private
       end
     end
   end

@@ -52,6 +52,12 @@ class TestController < ActionController::Base
     end
   end
 
+  def model_instance_as_dependency
+    behavior_cache Foo.find(params[:foo_id]) do
+      @foo
+    end
+  end
+
   private
   def current_locale
     'en_us'
@@ -235,5 +241,31 @@ class InterlatchTest < ActionController::TestCase
     get :view_cache_with_dependency
 
     assert_equal ['views/interlatch:8675309:test:view_cache_with_dependency:all:untagged'], @store.fetch('interlatch:Foo').to_a
+  end
+
+  def test_model_instance_as_dependency
+    foo = Foo.create
+
+    get :model_instance_as_dependency, foo_id: foo.id
+
+    assert_equal ['views/interlatch:8675309:test:model_instance_as_dependency:all:untagged'], @store.fetch("interlatch:Foo:#{foo.id}").to_a
+  end
+
+  def test_model_instance_as_dependency_invalidates_on_save
+    foo = Foo.create
+    get :model_instance_as_dependency, foo_id: foo.id
+
+    foo.save
+
+    assert_nil @store.fetch('views/interlatch:8675309:test:model_instance_as_dependency:all:untagged')
+  end
+
+  def test_model_instance_as_dependency_invalidates_on_destroy
+    foo = Foo.create
+    get :model_instance_as_dependency, foo_id: foo.id
+
+    foo.destroy
+
+    assert_nil @store.fetch('views/interlatch:8675309:test:model_instance_as_dependency:all:untagged')
   end
 end

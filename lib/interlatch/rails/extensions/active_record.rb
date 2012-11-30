@@ -13,6 +13,10 @@ module Interlatch
           (::Rails.cache.fetch(Interlatch.dependency_key(self.class)) || []).each do |key|
             ::Rails.cache.delete(key)
           end
+
+          (::Rails.cache.fetch(Interlatch.dependency_key(self)) || []).each do |key|
+            ::Rails.cache.delete(key)
+          end
         end
       end
     end
