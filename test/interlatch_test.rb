@@ -199,4 +199,16 @@ class InterlatchTest < ActionController::TestCase
 
     assert_nil @store.read('blah')
   end
+
+  def test_destroy_invalidates_cache
+    Interlatch::InvalidationObserver.instance
+
+    f = Foo.create
+    @store.write('interlatch:Foo', ['blah'])
+    @store.write('blah', 'blah')
+
+    f.destroy
+
+    assert_nil @store.read('blah')
+  end
 end
