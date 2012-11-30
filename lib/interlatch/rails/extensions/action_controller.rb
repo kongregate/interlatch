@@ -22,18 +22,11 @@ module Interlatch
           key = caching_key(options[:tag], options[:scope])
           unless fragment_exist? key
             yield
-            args.each do |dependency|
-              add_dependency(key, dependency.to_s)
-            end
+            Interlatch.add_dependencies(key, args)
           end
         end
 
         private
-        def add_dependency(key, dependency)
-          dependency_cache = cache_store.fetch("interlatch:#{dependency}").try(:dup) || Set.new
-          dependency_cache << "views/#{key}"
-          cache_store.write("interlatch:#{dependency}", dependency_cache)
-        end
       end
     end
   end

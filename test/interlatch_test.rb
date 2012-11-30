@@ -229,6 +229,11 @@ class InterlatchTest < ActionController::TestCase
     ensure
       Interlatch.locale_method = nil
     end
+  end
 
+  def test_view_cache_with_dependency
+    get :view_cache_with_dependency
+
+    assert_equal ['views/interlatch:8675309:test:view_cache_with_dependency:all:untagged'], @store.fetch('interlatch:Foo').to_a
   end
 end

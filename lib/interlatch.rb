@@ -20,5 +20,14 @@ module Interlatch
     "interlatch:#{dependency_class.to_s}"
   end
 
+  def add_dependencies(key, dependencies)
+    dependencies.each do |dependency|
+      dependency = dependency.to_s
+      dependency_cache = ::Rails.cache.fetch("interlatch:#{dependency}").try(:dup) || Set.new
+      dependency_cache << "views/#{key}"
+      ::Rails.cache.write("interlatch:#{dependency}", dependency_cache)
+    end
+  end
+
   mattr_accessor :locale_method
 end
