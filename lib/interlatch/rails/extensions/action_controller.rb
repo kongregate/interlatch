@@ -9,7 +9,9 @@ module ActionController
       elsif scope == :action
         options.merge! id: 'any'
       end
-      Interlatch.caching_key(options[:controller], options[:action], options[:id], options[:tag])
+      locale = Interlatch.locale_method ? self.send(Interlatch.locale_method) : nil
+
+      Interlatch.caching_key(options[:controller], options[:action], options[:id], options[:tag], locale)
     end
 
     def behavior_cache(*args, &block)

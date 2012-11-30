@@ -51,6 +51,11 @@ class TestController < ActionController::Base
       @foo = 'foo'
     end
   end
+
+  private
+  def current_locale
+    'en_us'
+  end
 end
 
 class InterlatchTest < ActionController::TestCase
@@ -214,4 +219,16 @@ class InterlatchTest < ActionController::TestCase
     assert_equal "\nHI\n", @store.fetch('views/interlatch:8675309:test:no_args:all:untagged')
   end
 
+  def test_locale
+    begin
+      Interlatch.locale_method = :current_locale
+
+      get :no_args, id: '4'
+
+      assert_equal "\nHI\n", @store.fetch('views/interlatch:8675309:test:no_args:4:untagged:en_us')
+    ensure
+      Interlatch.locale_method = nil
+    end
+
+  end
 end
