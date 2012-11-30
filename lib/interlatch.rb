@@ -5,7 +5,7 @@ module Interlatch
   extend self
 
   def caching_key(controller, action, id, tag)
-    "interlatch:#{ENV['RAILS_ASSET_ID']}:#{controller}:#{action}:#{id}:#{tag}"
+    "interlatch:#{ENV['RAILS_ASSET_ID']}:#{controller}:#{action}:#{id || 'all'}:#{tag || 'untagged'}"
   end
 
   def dependency_key(dependency_class)

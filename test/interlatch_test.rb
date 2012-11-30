@@ -65,7 +65,7 @@ class InterlatchTest < ActionController::TestCase
   def test_view_cache_with_no_args
     get :no_args, id: '4'
 
-    assert_equal "\nHI\n", @store.fetch('views/interlatch:8675309:test:no_args:4:')
+    assert_equal "\nHI\n", @store.fetch('views/interlatch:8675309:test:no_args:4:untagged')
   end
 
   def test_behavior_cache_with_no_args_when_cold
@@ -75,7 +75,7 @@ class InterlatchTest < ActionController::TestCase
   end
 
   def test_behavior_cache_with_no_args_when_hot
-    @store.write('views/interlatch:8675309:test:no_args:4:', 'blah')
+    @store.write('views/interlatch:8675309:test:no_args:4:untagged', 'blah')
 
     get :no_args, id: '4'
 
@@ -105,7 +105,7 @@ class InterlatchTest < ActionController::TestCase
   def test_view_cache_with_ttl
     get :with_ttl, id: '4'
 
-    assert_equal 5.minutes, @store.send(:read_entry, 'views/interlatch:8675309:test:with_ttl:4:', nil).expires_in
+    assert_equal 5.minutes, @store.send(:read_entry, 'views/interlatch:8675309:test:with_ttl:4:untagged', nil).expires_in
   end
 
   def test_view_cache_with_global_scope
@@ -171,14 +171,14 @@ class InterlatchTest < ActionController::TestCase
   def test_behavior_cache_with_one_dependency
     get :with_one_dependency, id: '4'
 
-    assert_equal ['views/interlatch:8675309:test:with_one_dependency:4:'], @store.fetch('interlatch:Foo').to_a
+    assert_equal ['views/interlatch:8675309:test:with_one_dependency:4:untagged'], @store.fetch('interlatch:Foo').to_a
   end
 
   def test_behavior_cache_with_two_dependencies
     get :with_two_dependencies, id: '4'
 
-    assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:'], @store.fetch('interlatch:Foo').to_a
-    assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:'], @store.fetch('interlatch:Bar').to_a
+    assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:untagged'], @store.fetch('interlatch:Foo').to_a
+    assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:untagged'], @store.fetch('interlatch:Bar').to_a
   end
 
   def test_dependency_with_multiple_view_caches
@@ -186,7 +186,7 @@ class InterlatchTest < ActionController::TestCase
 
     get :with_one_dependency, id: '4'
 
-    assert_equal ['blah', 'views/interlatch:8675309:test:with_one_dependency:4:'], @store.fetch('interlatch:Foo').to_a
+    assert_equal ['blah', 'views/interlatch:8675309:test:with_one_dependency:4:untagged'], @store.fetch('interlatch:Foo').to_a
   end
 
   def test_create_invalidates_cache
@@ -211,4 +211,11 @@ class InterlatchTest < ActionController::TestCase
 
     assert_nil @store.read('blah')
   end
+
+  def test_null_id_is_all
+    get :no_args
+
+    assert_equal "\nHI\n", @store.fetch('views/interlatch:8675309:test:no_args:all:untagged')
+  end
+
 end
