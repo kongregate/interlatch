@@ -19,6 +19,11 @@ module Interlatch
         def behavior_cache(*args, &block)
           options = args.extract_options!
 
+          if options[:perform] == false || !perform_caching
+            yield
+            return
+          end
+
           key = caching_key(options[:tag], options[:scope])
           unless fragment_exist? key
             yield

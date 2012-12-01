@@ -58,6 +58,12 @@ class TestController < ActionController::Base
     end
   end
 
+  def perform
+    behavior_cache perform: false do
+      @foo = 'foo'
+    end
+  end
+
   private
   def current_locale
     'en_us'
@@ -267,5 +273,36 @@ class InterlatchTest < ActionController::TestCase
     foo.destroy
 
     assert_nil @store.fetch('views/interlatch:8675309:test:model_instance_as_dependency:all:untagged')
+  end
+
+  def test_no_caching_doesnt_cache
+    @controller.perform_caching = false
+
+    get :no_args, id: '4'
+
+    assert_nil @store.fetch('views/interlatch:8675309:test:no_args:4:untagged')
+  end
+
+  def test_no_caching_always_runs_behavior
+    @controller.perform_caching = false
+    @store.write('views/interlatch:8675309:test:no_args:4:untagged', 'foo')
+
+    get :no_args, id: '4'
+
+    assert_equal 'foo', assigns(:foo)
+  end
+
+  def test_perform_false_doesnt_cache
+    get :perform
+
+    assert_nil @store.fetch('views/interlatch:8675309:test:perform:all:untagged')
+  end
+
+  def test_perform_false_always_runs_behavior
+    @store.write('views/interlatch:8675309:test:perform:all:untagged', 'foo')
+
+    get :perform
+
+    assert_equal 'foo', assigns(:foo)
   end
 end
