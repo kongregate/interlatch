@@ -82,7 +82,7 @@ class InterlatchTest < ActionController::TestCase
   def test_view_cache_with_no_args
     get :no_args, id: '4'
 
-    assert_equal "\nHI\n", @store.fetch('views/interlatch:8675309:test:no_args:4:untagged')
+    assert_equal "\nHI\n", @store.read('views/interlatch:8675309:test:no_args:4:untagged')
   end
 
   def test_behavior_cache_with_no_args_when_cold
@@ -102,7 +102,7 @@ class InterlatchTest < ActionController::TestCase
   def test_view_cache_with_tag
     get :with_tag, id: '4'
 
-    assert_equal "\nHI\n", @store.fetch('views/interlatch:8675309:test:with_tag:4:tag')
+    assert_equal "\nHI\n", @store.read('views/interlatch:8675309:test:with_tag:4:tag')
   end
 
   def test_behavior_cache_with_tag_when_cold
@@ -128,7 +128,7 @@ class InterlatchTest < ActionController::TestCase
   def test_view_cache_with_global_scope
     get :with_global_scope, id: '4'
 
-    assert_equal "\nHI\n", @store.fetch('views/interlatch:8675309:any:any:any:tag')
+    assert_equal "\nHI\n", @store.read('views/interlatch:8675309:any:any:any:tag')
   end
 
   def test_behavior_cache_with_global_scope_when_cold
@@ -148,7 +148,7 @@ class InterlatchTest < ActionController::TestCase
   def test_view_cache_with_controller_scope
     get :with_controller_scope, id: '4'
 
-    assert_equal "\nHI\n", @store.fetch('views/interlatch:8675309:test:any:any:tag')
+    assert_equal "\nHI\n", @store.read('views/interlatch:8675309:test:any:any:tag')
   end
 
   def test_behavior_cache_with_controller_scope_when_cold
@@ -168,7 +168,7 @@ class InterlatchTest < ActionController::TestCase
   def test_view_cache_with_action_scope
     get :with_action_scope, id: '4'
 
-    assert_equal "\nHI\n", @store.fetch('views/interlatch:8675309:test:with_action_scope:any:tag')
+    assert_equal "\nHI\n", @store.read('views/interlatch:8675309:test:with_action_scope:any:tag')
   end
 
   def test_behavior_cache_with_action_scope_when_cold
@@ -188,14 +188,14 @@ class InterlatchTest < ActionController::TestCase
   def test_behavior_cache_with_one_dependency
     get :with_one_dependency, id: '4'
 
-    assert_equal ['views/interlatch:8675309:test:with_one_dependency:4:untagged'], @store.fetch('interlatch:Foo').to_a
+    assert_equal ['views/interlatch:8675309:test:with_one_dependency:4:untagged'], @store.read('interlatch:Foo').to_a
   end
 
   def test_behavior_cache_with_two_dependencies
     get :with_two_dependencies, id: '4'
 
-    assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:untagged'], @store.fetch('interlatch:Foo').to_a
-    assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:untagged'], @store.fetch('interlatch:Bar').to_a
+    assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:untagged'], @store.read('interlatch:Foo').to_a
+    assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:untagged'], @store.read('interlatch:Bar').to_a
   end
 
   def test_dependency_with_multiple_view_caches
@@ -203,7 +203,7 @@ class InterlatchTest < ActionController::TestCase
 
     get :with_one_dependency, id: '4'
 
-    assert_equal ['blah', 'views/interlatch:8675309:test:with_one_dependency:4:untagged'], @store.fetch('interlatch:Foo').to_a
+    assert_equal ['blah', 'views/interlatch:8675309:test:with_one_dependency:4:untagged'], @store.read('interlatch:Foo').to_a
   end
 
   def test_create_invalidates_cache
@@ -228,7 +228,7 @@ class InterlatchTest < ActionController::TestCase
   def test_null_id_is_all
     get :no_args
 
-    assert_equal "\nHI\n", @store.fetch('views/interlatch:8675309:test:no_args:all:untagged')
+    assert_equal "\nHI\n", @store.read('views/interlatch:8675309:test:no_args:all:untagged')
   end
 
   def test_locale
@@ -237,7 +237,7 @@ class InterlatchTest < ActionController::TestCase
 
       get :no_args, id: '4'
 
-      assert_equal "\nHI\n", @store.fetch('views/interlatch:8675309:test:no_args:4:untagged:en_us')
+      assert_equal "\nHI\n", @store.read('views/interlatch:8675309:test:no_args:4:untagged:en_us')
     ensure
       Interlatch.locale_method = nil
     end
@@ -246,7 +246,7 @@ class InterlatchTest < ActionController::TestCase
   def test_view_cache_with_dependency
     get :view_cache_with_dependency
 
-    assert_equal ['views/interlatch:8675309:test:view_cache_with_dependency:all:untagged'], @store.fetch('interlatch:Foo').to_a
+    assert_equal ['views/interlatch:8675309:test:view_cache_with_dependency:all:untagged'], @store.read('interlatch:Foo').to_a
   end
 
   def test_model_instance_as_dependency
@@ -254,7 +254,7 @@ class InterlatchTest < ActionController::TestCase
 
     get :model_instance_as_dependency, foo_id: foo.id
 
-    assert_equal ['views/interlatch:8675309:test:model_instance_as_dependency:all:untagged'], @store.fetch("interlatch:Foo:#{foo.id}").to_a
+    assert_equal ['views/interlatch:8675309:test:model_instance_as_dependency:all:untagged'], @store.read("interlatch:Foo:#{foo.id}").to_a
   end
 
   def test_model_instance_as_dependency_invalidates_on_save
@@ -263,7 +263,7 @@ class InterlatchTest < ActionController::TestCase
 
     foo.save
 
-    assert_nil @store.fetch('views/interlatch:8675309:test:model_instance_as_dependency:all:untagged')
+    assert_nil @store.read('views/interlatch:8675309:test:model_instance_as_dependency:all:untagged')
   end
 
   def test_model_instance_as_dependency_invalidates_on_destroy
@@ -272,7 +272,7 @@ class InterlatchTest < ActionController::TestCase
 
     foo.destroy
 
-    assert_nil @store.fetch('views/interlatch:8675309:test:model_instance_as_dependency:all:untagged')
+    assert_nil @store.read('views/interlatch:8675309:test:model_instance_as_dependency:all:untagged')
   end
 
   def test_no_caching_doesnt_cache
@@ -280,7 +280,7 @@ class InterlatchTest < ActionController::TestCase
 
     get :no_args, id: '4'
 
-    assert_nil @store.fetch('views/interlatch:8675309:test:no_args:4:untagged')
+    assert_nil @store.read('views/interlatch:8675309:test:no_args:4:untagged')
   end
 
   def test_no_caching_always_runs_behavior
@@ -295,7 +295,7 @@ class InterlatchTest < ActionController::TestCase
   def test_perform_false_doesnt_cache
     get :perform
 
-    assert_nil @store.fetch('views/interlatch:8675309:test:perform:all:untagged')
+    assert_nil @store.read('views/interlatch:8675309:test:perform:all:untagged')
   end
 
   def test_perform_false_always_runs_behavior

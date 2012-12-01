@@ -24,7 +24,7 @@ module Interlatch
   def add_dependencies(key, dependencies)
     dependencies.each do |dependency|
       dep_key = dependency_key(dependency)
-      dependency_cache = ::Rails.cache.fetch(dep_key).try(:dup) || Set.new
+      dependency_cache = ::Rails.cache.read(dep_key).try(:dup) || Set.new
       dependency_cache << "views/#{key}"
       ::Rails.cache.write(dep_key, dependency_cache)
     end

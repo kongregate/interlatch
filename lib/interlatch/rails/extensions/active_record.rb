@@ -15,14 +15,14 @@ module Interlatch
         end
 
         def invalidate_interlatch_instance_caches
-          (::Rails.cache.fetch(Interlatch.dependency_key(self)) || []).each do |key|
+          (::Rails.cache.read(Interlatch.dependency_key(self)) || []).each do |key|
             ::Rails.cache.delete(key)
           end
         end
 
         module ClassMethods
           def invalidate_interlatch_class_caches
-            (::Rails.cache.fetch(Interlatch.dependency_key(self)) || []).each do |key|
+            (::Rails.cache.read(Interlatch.dependency_key(self)) || []).each do |key|
               ::Rails.cache.delete(key)
             end
           end
