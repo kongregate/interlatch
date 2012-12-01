@@ -18,6 +18,7 @@ module Interlatch
 
         def behavior_cache(*args, &block)
           options = args.extract_options!
+          options.assert_valid_keys(:perform, :scope, :tag)
 
           if options[:perform] == false || !perform_caching
             yield

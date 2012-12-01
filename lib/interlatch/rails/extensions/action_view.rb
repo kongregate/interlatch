@@ -3,6 +3,7 @@ module ActionView
     module CacheHelper
        def view_cache(*args, &block)
          options = args.extract_options!
+         options.assert_valid_keys(:perform, :scope, :tag, :ttl)
 
          if options[:perform] == false || !controller.perform_caching
            return capture(&block)
