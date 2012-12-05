@@ -10,9 +10,8 @@ module ActionView
          end
 
          key = controller.caching_key(options[:tag], options[:scope])
-         cache(key, expires_in: options[:ttl], &block).tap do
-           Interlatch.add_dependencies(key, args)
-         end
+         Interlatch.add_dependencies(key, args)
+         cache(key, expires_in: options[:ttl], &block)
        end
     end
   end

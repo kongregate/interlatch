@@ -26,9 +26,9 @@ module Interlatch
           end
 
           key = caching_key(options[:tag], options[:scope])
+          Interlatch.add_dependencies(key, args)
           unless fragment_exist? key
             yield
-            Interlatch.add_dependencies(key, args)
           end
         end
       end
