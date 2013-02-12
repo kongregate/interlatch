@@ -30,5 +30,5 @@ module Interlatch
     end
   end
 
-  mattr_accessor :locale_method
+  mattr_accessor :locale_method, :add_clear_caching_links
 end
