@@ -13,7 +13,6 @@ module ActionView
          Interlatch.add_dependencies(key, args)
          cache(key, expires_in: options[:ttl], &block)
          # doing this more simply fails for some reason
-         raise clear_link(key).inspect
          @output_buffer = @output_buffer.nil? ? clear_link(key) : @output_buffer.to_s + clear_link(key)
        end
        
