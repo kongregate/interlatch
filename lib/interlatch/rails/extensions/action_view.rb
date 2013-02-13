@@ -18,7 +18,7 @@ module ActionView
        
        def clear_link(key)
          link_to_function("clear key for #{key}", "active_user.eraseCacheKey('#{key}', event)", 
-          :class => :cache_link, :style => "style='color:#22B5BF; display:none'", :title => key )
+          :class => :cache_link, :style => "color:#22B5BF; display:none", :title => key )
        end
     end
   end
