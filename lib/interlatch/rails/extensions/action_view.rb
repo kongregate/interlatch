@@ -17,8 +17,10 @@ module ActionView
        end
        
        def clear_link(key)
-         link_to_function("clear key for #{key}", "active_user.eraseCacheKey('#{key}', event)", 
-          :class => :cache_link, :style => "color:#22B5BF; display:none", :title => key )
+         key.sub!(/:[a-zA-Z\-]*$/, ':%s') # slice off the language
+         
+         link_to_function("clear key for #{key}", "active_user.deleteCacheKey('#{key}', event)", 
+          :class => :caching_link, :style => "color:#22B5BF; display:none", :title => key)
        end
     end
   end
