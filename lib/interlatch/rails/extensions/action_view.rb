@@ -17,7 +17,7 @@ module ActionView
        end
        
        def clear_link(key)
-         key = "views/#{key}" 
+         key = "views%2F#{key}" 
          key.sub!(/:[a-zA-Z\-]*$/, ':%25s') # slice off the language
          
          link_to_function("clear key for #{key}", "active_user.deleteCacheKey('#{key}', event)", 
