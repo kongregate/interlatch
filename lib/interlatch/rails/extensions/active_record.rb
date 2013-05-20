@@ -7,6 +7,7 @@ module Interlatch
         included do
           after_save :invalidate_interlatch_caches
           after_destroy :invalidate_interlatch_caches
+          after_touch :invalidate_interlatch_caches
         end
 
         def invalidate_interlatch_caches
