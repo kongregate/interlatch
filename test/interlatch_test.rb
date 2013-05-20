@@ -266,6 +266,15 @@ class InterlatchTest < ActionController::TestCase
     assert_nil @store.read('views/interlatch:8675309:test:model_instance_as_dependency:all:untagged')
   end
 
+  def test_model_instance_as_dependency_invalidates_on_touch
+    foo = Foo.create
+    get :model_instance_as_dependency, foo_id: foo.id
+
+    foo.touch
+
+    assert_nil @store.read('views/interlatch:8675309:test:model_instance_as_dependency:all:untagged')
+  end
+
   def test_model_instance_as_dependency_invalidates_on_destroy
     foo = Foo.create
     get :model_instance_as_dependency, foo_id: foo.id
