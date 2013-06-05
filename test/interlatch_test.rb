@@ -1,4 +1,4 @@
-require 'test_helper'
+require_relative 'test_helper'
 
 ActiveRecord::Base.establish_connection 'test'
 class Foo < ActiveRecord::Base
