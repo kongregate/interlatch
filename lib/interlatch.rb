@@ -4,7 +4,7 @@ require 'interlatch/rails'
 module Interlatch
   extend self
 
-  def caching_key(controller, action, id, tag, locale)
+  def caching_key(controller, action, id, tag, locale, watermark)
     parts = [
       "interlatch",
       ENV['RAILS_ASSET_ID'],
@@ -12,7 +12,8 @@ module Interlatch
       action,
       id || 'all',
       tag || 'untagged',
-      locale
+      locale,
+      watermark
     ].compact.join(":")
   end
 
@@ -30,5 +31,5 @@ module Interlatch
     end
   end
 
-  mattr_accessor :locale_method, :add_clear_caching_links
+  mattr_accessor :locale_method, :add_clear_caching_links, :watermark_method
 end

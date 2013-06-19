@@ -12,8 +12,9 @@ module Interlatch
             options.merge! id: 'any'
           end
           locale = Interlatch.locale_method ? self.send(Interlatch.locale_method) : nil
+          watermark = Interlatch.watermark_method ? self.send(Interlatch.watermark_method) : nil
 
-          Interlatch.caching_key(options[:controller], options[:action], options[:id], options[:tag], locale)
+          Interlatch.caching_key(options[:controller], options[:action], options[:id], options[:tag], locale, watermark)
         end
 
         def behavior_cache(*args, &block)
