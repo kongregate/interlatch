@@ -19,7 +19,7 @@ module ActionView
        def clear_caching_link(key, css_class = 'clear_caching_link', text = nil)
          return unless Interlatch.add_clear_caching_links
          text ||= "clear key for #{key}"
-         link_to text, "#", "data-key" => key, :class => css_class, :title => key
+         link_to text, "#", "data-key" => key, :class => css_class, :title => key, :style => "display:none"
        end
     end
   end
