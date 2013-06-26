@@ -1,5 +1,4 @@
 require_relative 'test_helper'
-require 'set'
 
 ActiveRecord::Base.establish_connection 'test'
 class Foo < ActiveRecord::Base
@@ -68,10 +67,6 @@ class TestController < ActionController::Base
   private
   def current_locale
     'en_us'
-  end
-
-  def current_watermark
-    '54321'
   end
 end
 
@@ -321,15 +316,17 @@ class InterlatchTest < ActionController::TestCase
     assert_equal 'foo', assigns(:foo)
   end
 
-  def test_watermark
+  def test_cache_version_hook
     begin
-      Interlatch.watermark_method = :current_watermark
+      Interlatch.cache_version_hook = lambda do
+        "54321"
+      end
 
       get :no_args, id: '4'
 
       assert_equal "\nHI\n", @store.read('views/interlatch:8675309:test:no_args:4:untagged:54321')
     ensure
-      Interlatch.watermark_method = nil
+      Interlatch.cache_version_hook = nil
     end
   end
 end
