@@ -76,6 +76,7 @@ class InterlatchTest < ActionController::TestCase
 
     @controller = TestController.new
     @controller.cache_store = @store
+
     silence_warnings { Object.const_set "RAILS_CACHE", @store }
   end
 
@@ -313,5 +314,19 @@ class InterlatchTest < ActionController::TestCase
     get :perform
 
     assert_equal 'foo', assigns(:foo)
+  end
+
+  def test_cache_version_hook
+    begin
+      Interlatch.cache_version_hook = lambda do
+        "54321"
+      end
+
+      get :no_args, id: '4'
+
+      assert_equal "\nHI\n", @store.read('views/interlatch:8675309:test:no_args:4:untagged:54321')
+    ensure
+      Interlatch.cache_version_hook = nil
+    end
   end
 end
