@@ -11,11 +11,11 @@ module ActionView
 
          key = controller.caching_key(options[:tag], options[:scope])
          Interlatch.add_dependencies(key, args)
-         cache(key, expires_in: options[:ttl], &block)
+         cache(key, expires_in: options[:ttl], skip_digest: true, &block)
          clear_link = clear_caching_link("views/#{key}")
          (@output_buffer = @output_buffer.nil? ? clear_link : @output_buffer.to_s + clear_link) if clear_link
        end
-       
+
        def clear_caching_link(key, css_class = 'clear_caching_link', text = nil)
          return unless Interlatch.add_clear_caching_links
          text ||= "clear key for #{key}"
