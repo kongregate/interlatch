@@ -122,7 +122,8 @@ class InterlatchTest < ActionController::TestCase
   def test_view_cache_with_ttl
     get :with_ttl, id: '4'
 
-    assert_equal 5.minutes, @store.send(:read_entry, 'views/interlatch:8675309:test:with_ttl:4:untagged', nil).expires_in
+    assert_equal 5.minutes.from_now.to_i,
+                 @store.send(:read_entry, 'views/interlatch:8675309:test:with_ttl:4:untagged', nil).expires_at.to_i
   end
 
   def test_view_cache_with_global_scope
