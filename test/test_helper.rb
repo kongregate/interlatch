@@ -7,6 +7,8 @@ require 'active_record'
 
 require 'interlatch'
 
+ActiveSupport::TestCase.test_order = :sorted
+
 ENV['RAILS_ASSET_ID'] = '8675309'
 
 SHARED_TEST_ROUTES = ActionDispatch::Routing::RouteSet.new
