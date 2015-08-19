@@ -73,11 +73,10 @@ end
 class InterlatchTest < ActionController::TestCase
   def setup
     @store = ActiveSupport::Cache::MemoryStore.new
+    ActionController::Base.config.cache_store = @store
+    Rails.cache = @store
 
     @controller = TestController.new
-    @controller.cache_store = @store
-
-    silence_warnings { Object.const_set "RAILS_CACHE", @store }
   end
 
   def test_view_cache_with_no_args
