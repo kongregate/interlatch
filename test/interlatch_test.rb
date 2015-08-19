@@ -1,6 +1,6 @@
 require_relative 'test_helper'
 
-ActiveRecord::Base.establish_connection 'test'
+ActiveRecord::Base.establish_connection :test
 class Foo < ActiveRecord::Base
 end
 Foo.connection.create_table(:foos)
