@@ -4,9 +4,9 @@ require File.expand_path('../lib/interlatch/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Drew Chandler", "Pete Keen"]
   gem.email         = ["drew@kongregate.com", "pkeen@kongregate.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
+  gem.description   = %q{Rails 3+ Interlock replacement}
+  gem.summary       = %q{Coordinates cached view fragments and controller blocks}
+  gem.homepage      = "https://github.com/kongregate/interlatch"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
