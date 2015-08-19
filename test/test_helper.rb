@@ -1,5 +1,6 @@
 require 'minitest/autorun'
 
+require 'byebug'
 require 'rails'
 require 'action_controller'
 require 'active_record'
