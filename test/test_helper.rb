@@ -13,7 +13,7 @@ ENV['RAILS_ASSET_ID'] = '8675309'
 
 SHARED_TEST_ROUTES = ActionDispatch::Routing::RouteSet.new
 SHARED_TEST_ROUTES.draw do
-  match ':controller(/:action(/:id))'
+  match ':controller(/:action(/:id))', via: :all
 end
 
 TEMPLATE_PATH = File.join(File.dirname(__FILE__), 'templates')
