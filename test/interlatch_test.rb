@@ -329,4 +329,17 @@ class InterlatchTest < ActionController::TestCase
       Interlatch.cache_version_hook = nil
     end
   end
+
+  def test_comment_markers
+    begin
+      Interlatch.comment_markers = true
+
+      get :no_args, id: '4'
+
+      key = 'views/interlatch:8675309:test:no_args:4:untagged'
+      assert_match(%r(<!-- INTERLATCH BEGIN: #{key} -->\s*HI\s*<!-- INTERLATCH END: #{key} -->), @response.body)
+    ensure
+      Interlatch.comment_markers = false
+    end
+  end
 end

@@ -33,5 +33,5 @@ module Interlatch
     end
   end
 
-  mattr_accessor :locale_method, :cache_version_hook
+  mattr_accessor :locale_method, :comment_markers, :cache_version_hook
 end
