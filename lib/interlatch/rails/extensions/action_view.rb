@@ -12,15 +12,17 @@ module ActionView
          key = controller.caching_key(options[:tag], options[:scope])
          Interlatch.add_dependencies(key, args)
          cache(key, expires_in: options[:ttl], skip_digest: true, &block)
-         clear_link = clear_caching_link("views/#{key}")
-         (@output_buffer = @output_buffer.nil? ? clear_link : @output_buffer.to_s + clear_link) if clear_link
+         wrap_in_comments(key) if Interlatch.comment_markers
        end
 
-       def clear_caching_link(key, css_class = 'clear_caching_link', text = nil)
-         return unless Interlatch.add_clear_caching_links
-         text ||= "clear key for #{key}"
-         link_to text, "#", "data-key" => key, :class => css_class, :title => key, :style => "display:none"
-       end
+      private
+
+        def wrap_in_comments(key)
+          @output_buffer = ActionView::OutputBuffer.new(
+            "<!-- INTERLATCH BEGIN: views/#{key} -->\n" \
+            "#@output_buffer\n<!-- INTERLATCH END: views/#{key} -->".html_safe
+          )
+        end
     end
   end
 end

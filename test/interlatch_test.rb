@@ -1,6 +1,6 @@
 require_relative 'test_helper'
 
-ActiveRecord::Base.establish_connection 'test'
+ActiveRecord::Base.establish_connection :test
 class Foo < ActiveRecord::Base
 end
 Foo.connection.create_table(:foos)
@@ -73,11 +73,10 @@ end
 class InterlatchTest < ActionController::TestCase
   def setup
     @store = ActiveSupport::Cache::MemoryStore.new
+    ActionController::Base.config.cache_store = @store
+    Rails.cache = @store
 
     @controller = TestController.new
-    @controller.cache_store = @store
-
-    silence_warnings { Object.const_set "RAILS_CACHE", @store }
   end
 
   def test_view_cache_with_no_args
@@ -123,7 +122,8 @@ class InterlatchTest < ActionController::TestCase
   def test_view_cache_with_ttl
     get :with_ttl, id: '4'
 
-    assert_equal 5.minutes, @store.send(:read_entry, 'views/interlatch:8675309:test:with_ttl:4:untagged', nil).expires_in
+    assert_equal 5.minutes.from_now.to_i,
+                 @store.send(:read_entry, 'views/interlatch:8675309:test:with_ttl:4:untagged', nil).expires_at.to_i
   end
 
   def test_view_cache_with_global_scope
@@ -327,6 +327,19 @@ class InterlatchTest < ActionController::TestCase
       assert_equal "\nHI\n", @store.read('views/interlatch:8675309:test:no_args:4:untagged:54321')
     ensure
       Interlatch.cache_version_hook = nil
+    end
+  end
+
+  def test_comment_markers
+    begin
+      Interlatch.comment_markers = true
+
+      get :no_args, id: '4'
+
+      key = 'views/interlatch:8675309:test:no_args:4:untagged'
+      assert_match(%r(<!-- INTERLATCH BEGIN: #{key} -->\s*HI\s*<!-- INTERLATCH END: #{key} -->), @response.body)
+    ensure
+      Interlatch.comment_markers = false
     end
   end
 end

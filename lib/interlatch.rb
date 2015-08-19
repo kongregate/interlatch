@@ -1,4 +1,4 @@
-require "interlatch/version"
+require 'interlatch/version'
 require 'interlatch/rails'
 
 module Interlatch
@@ -6,9 +6,9 @@ module Interlatch
 
   def caching_key(controller, action, id, tag, locale)
     cache_version = cache_version_hook ? cache_version_hook.call : nil
-      
-    parts = [
-      "interlatch",
+
+    [
+      'interlatch',
       ENV['RAILS_ASSET_ID'],
       controller,
       action,
@@ -16,7 +16,7 @@ module Interlatch
       tag || 'untagged',
       locale,
       cache_version
-    ].compact.join(":")
+    ].compact.join(':')
   end
 
   def dependency_key(dependency)
@@ -33,5 +33,5 @@ module Interlatch
     end
   end
 
-  mattr_accessor :locale_method, :add_clear_caching_links, :cache_version_hook
+  mattr_accessor :locale_method, :comment_markers, :cache_version_hook
 end
