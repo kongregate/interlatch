@@ -9,6 +9,10 @@ class Bar < ActiveRecord::Base
 end
 Bar.connection.create_table(:bars)
 
+class Foobar < ActiveRecord::Base
+end
+Foobar.connection.create_table(:foobars)
+
 class TestController < ActionController::Base
   def no_args
     behavior_cache do
@@ -53,6 +57,7 @@ class TestController < ActionController::Base
   end
 
   def model_instance_as_dependency
+    @foo = nil
     behavior_cache Foo.find(params[:foo_id]) do
       @foo
     end
@@ -187,14 +192,18 @@ class InterlatchTest < ActionController::TestCase
   end
 
   def test_behavior_cache_with_one_dependency
+    assert !Interlatch.tracked_classes.include?(Foo)
     get :with_one_dependency, id: '4'
 
+    assert Interlatch.tracked_classes.include?(Foo)
     assert_equal ['views/interlatch:8675309:test:with_one_dependency:4:untagged'], @store.read('interlatch:Foo').to_a
   end
 
   def test_behavior_cache_with_two_dependencies
+    assert !Interlatch.tracked_classes.include?(Bar)
     get :with_two_dependencies, id: '4'
 
+    assert Interlatch.tracked_classes.include?(Bar)
     assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:untagged'], @store.read('interlatch:Foo').to_a
     assert_equal ['views/interlatch:8675309:test:with_two_dependencies:4:untagged'], @store.read('interlatch:Bar').to_a
   end
@@ -216,14 +225,69 @@ class InterlatchTest < ActionController::TestCase
     assert_nil @store.read('blah')
   end
 
-  def test_destroy_invalidates_cache
+  def test_touch_invalidates_cache
     f = Foo.create
     @store.write('interlatch:Foo', ['blah'])
     @store.write('blah', 'blah')
+    f.touch
+
+    assert_nil @store.read('blah')
+  end
+
+  def test_destroy_invalidates_cache
+    f = Foo.create
+    @store.write('interlatch:Foo', ['blah'])
+    @store.write("interlatch:Foo:#{f.id}", ['blahblah'])
+    @store.write('blah', 'blah')
+    @store.write('blahblah', 'blah')
 
     f.destroy
 
     assert_nil @store.read('blah')
+    assert_nil @store.read('blahblah')
+  end
+
+  def test_cache_not_invalidated_if_class_is_not_tracked
+    @store.write('interlatch:Foobar', ['blah'])
+    @store.write('blah', 'blah')
+
+    Foobar.create
+
+    assert_equal 'blah', @store.read('blah')
+  end
+
+  def test_touch_invalidates_cache
+    f = Foo.create
+    @store.write('interlatch:Foo', ['blah'])
+    @store.write('blah', 'blah')
+    f.touch
+
+    assert_nil @store.read('blah')
+  end
+
+  def test_destroy_invalidates_cache
+    f = Foo.create
+    @store.write('interlatch:Foo', ['blah'])
+    @store.write("interlatch:Foo:#{f.id}", ['blahblah'])
+    @store.write('blah', 'blah')
+    @store.write('blahblah', 'blah')
+
+    f.destroy
+
+    assert_nil @store.read('blah')
+    assert_nil @store.read('blahblah')
+  end
+
+  def test_invalidate_interlatch_instance_caches_removes_instance_cache
+    f = Foo.create
+    @store.write('interlatch:Foo', ['foo'])
+    @store.write("interlatch:Foo:#{f.id}", ['bar'])
+    @store.write('foo', 'bar')
+    @store.write('bar', 'foo')
+    f.invalidate_interlatch_instance_caches
+
+    assert_equal @store.read('foo'), 'bar'
+    assert_nil @store.read('bar')
   end
 
   def test_null_id_is_all

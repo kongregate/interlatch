@@ -19,6 +19,10 @@ module Interlatch
     ].compact.join(':')
   end
 
+  def dependency_class(dependency)
+    dependency.kind_of?(Class) ? dependency : dependency.class
+  end
+
   def dependency_key(dependency)
     dependency_str = dependency.kind_of?(Class) ? dependency.to_s : "#{dependency.class.name}:#{dependency.id}"
     "interlatch:#{dependency_str}"
@@ -26,6 +30,7 @@ module Interlatch
 
   def add_dependencies(key, dependencies)
     dependencies.each do |dependency|
+      tracked_classes << dependency_class(dependency)
       dep_key = dependency_key(dependency)
       dependency_cache = ::Rails.cache.read(dep_key).try(:dup) || Set.new
       dependency_cache << "views/#{key}"
@@ -33,5 +38,6 @@ module Interlatch
     end
   end
 
-  mattr_accessor :locale_method, :comment_markers, :cache_version_hook
+  mattr_accessor :locale_method, :comment_markers, :cache_version_hook, :tracked_classes
+  self.tracked_classes = Set.new
 end

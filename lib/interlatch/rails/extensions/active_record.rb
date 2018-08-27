@@ -10,23 +10,19 @@ module Interlatch
           after_touch :invalidate_interlatch_caches
         end
 
-        def invalidate_interlatch_caches
-          self.class.invalidate_interlatch_class_caches
-          invalidate_interlatch_instance_caches
+        def invalidate_interlatch_caches(instance_only = false)
+          return unless Interlatch.tracked_classes.include?(self.class)
+
+          keys = [Interlatch.dependency_key(self)]
+          keys <<= Interlatch.dependency_key(self.class) unless instance_only
+
+          ::Rails.cache.read_multi(*keys).values.compact.each do |set|
+            set.each { |key| ::Rails.cache.delete(key) }
+          end
         end
 
         def invalidate_interlatch_instance_caches
-          (::Rails.cache.read(Interlatch.dependency_key(self)) || []).each do |key|
-            ::Rails.cache.delete(key.dup)
-          end
-        end
-
-        module ClassMethods
-          def invalidate_interlatch_class_caches
-            (::Rails.cache.read(Interlatch.dependency_key(self)) || []).each do |key|
-              ::Rails.cache.delete(key.dup)
-            end
-          end
+          invalidate_interlatch_caches(true)
         end
       end
     end
